@@ -1,0 +1,19 @@
+#!/bin/sh
+echo "ACME_DOMAIN: $ACME_DOMAIN"
+echo "ACME_RELOAD: $ACME_RELOAD"
+echo "AWS_REGION: $AWS_REGION"
+echo "AWS_DNS_SLOWRATE: $AWS_DNS_SLOWRATE"
+echo "AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID"
+
+echo "Create directory"
+mkdir -p /certs/$ACME_DOMAIN
+echo "Issue certificate"
+/root/.acme.sh/acme.sh --issue --dns dns_aws -d $ACME_DOMAIN
+sleep 1
+echo "Deploy certificate"
+/root/.acme.sh/acme.sh --install-cert -d $ACME_DOMAIN \
+                       --cert-file /certs/$ACME_DOMAIN/cert.pem  \
+                       --key-file /certs/$ACME_DOMAIN/key.pem  \
+                       --fullchain-file /certs/$ACME_DOMAIN/fullchain.pem \
+                       --reloadcmd "$ACME_RELOAD"
+echo "Done."
